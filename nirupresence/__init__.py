@@ -1,0 +1,2 @@
+"""NIRUPRESENCE Linux companion."""
+__version__ = "0.5.6"
