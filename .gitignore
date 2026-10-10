@@ -1,0 +1,14 @@
+# Local credentials and machine state
+nirupresence-config.json
+config.json
+.env
+.env.*
+*.log
+*.db
+*.sqlite*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.zip
