@@ -2,7 +2,7 @@
 
 A lightweight Linux terminal application for managing presence, status updates, music activity and related features on my personal website.
 
-**Version 0.5.6 · Personal project · Open source · MIT License**  
+**Version 0.5.7 · Personal project · Open source · MIT License**  
 Created by **Ing Leif Nicklas Rudolfsson**.
 
 ## About this project
