@@ -365,6 +365,15 @@ def cmd_offline(value):
     if not offline: cmd_heartbeat()
     return result
 
+def cmd_presence_mode(mode):
+    """Set global server mode without overriding local heartbeat preferences."""
+    if mode not in ('auto', 'online', 'offline'):
+        raise ValueError('Invalid presence mode')
+    result = api('presence/offline', 'PUT', {'mode': mode})
+    if result.get('ok'):
+        save_state({'manual_offline': mode == 'offline'})
+    return result
+
 def cmd_wake():
     cp=clock_policy(); today=cp["date"]
     save_state({"manual_offline":False,"force_wake_date":today,"wake_date":today,"session_started":int(time.time()),"last_track_key":"","last_music_sent":0})

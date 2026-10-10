@@ -12,7 +12,7 @@ from pathlib import Path
 PREFS = Path.home() / '.config/nirupresence/linux.json'
 
 def preferences():
-    defaults = {'heartbeat': False, 'music': True, 'interval': 20, 'night_policy': False}
+    defaults = {'heartbeat': True, 'music': True, 'interval': 20, 'night_policy': False}
     defaults.update({k:v for k,v in legacy.read_json(PREFS, {}).items() if k in defaults})
     return defaults
 
@@ -30,17 +30,14 @@ def sync_cycle():
         return {'ok': False, 'reason': 'not configured'}
     # Presence offline does not disable explicitly opted-in music sharing.
     result = {}
-    # Multi-device safety: a secondary computer never sends global offline or
-    # wake events unless the user explicitly enables heartbeat/night policy.
-    if p['heartbeat'] and not legacy.state()['manual_offline']:
-        if p['night_policy']:
-            result['heartbeat'] = legacy.cmd_heartbeat()
-        else:
+    # The server owns night scheduling, two-hour timeout and global manual mode.
+    # Heartbeats must not override a manually selected server mode.
+    if p['heartbeat']:
+        s = legacy.state()
+        if not s['session_started']:
+            legacy.save_state({'session_started': int(time.time())})
             s = legacy.state()
-            if not s['session_started']:
-                legacy.save_state({'session_started': int(time.time())})
-                s = legacy.state()
-            result['heartbeat'] = legacy.api('presence/heartbeat', 'PUT', {'session_started': s['session_started']})
+        result['heartbeat'] = legacy.api('presence/heartbeat', 'PUT', {'session_started': s['session_started']})
         # Temporary presence is server-owned and expires without a client heartbeat.
     if p['music'] and legacy.state()['share_music']:
         # Original sync-music invokes global night policy. For secondary hosts,

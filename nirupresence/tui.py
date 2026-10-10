@@ -113,8 +113,8 @@ class UI:
             expiry=int(temporary.get('until') or 0)
             remaining=max(0,(expiry-int(time.time())+59)//60) if expiry else 0
             rows=[('PUBLIC STATUS',pub.get('status') or '—'),('TEMPORARY',f'Active · {remaining} min remaining' if expiry>time.time() else 'Inactive'),('EXPIRES',time.strftime('%Y-%m-%d %H:%M',time.localtime(expiry)) if expiry else '—'),('ONLINE','Yes' if pub.get('online') else 'No'),
-                  ('DETAIL',pub.get('detail') or '—'),('MANUAL OFFLINE','Yes' if s['manual_offline'] else 'No')]
-            actions=['[o] Online  [f] Offline','[s] Set status  [t] Temporary  [c] Cancel temporary']
+                  ('DETAIL',pub.get('detail') or '—'),('MODE',str(pub.get('presence_mode') or 'auto').upper())]
+            actions=['[a] Auto  [o] Online  [f] Offline','[s] Set status  [t] Temporary  [c] Cancel temporary']
         elif self.page=='music':
             rows=[('PLAYER',player.get('source') or '—'),('TYPE',player.get('media_type') or '—'),
                   ('ARTIST / CHANNEL',player.get('artist') or '—'),('TITLE',player.get('title') or '—'),
@@ -122,8 +122,8 @@ class UI:
                   ('SHARING','Enabled' if p['music'] and s['share_music'] else 'Disabled')]
             actions=['[m] Toggle sharing  [r] Send now']
         elif self.page=='night':
-            rows=[('NIGHT POLICY','Enabled' if p['night_policy'] else 'Disabled'),
-                  ('LOCAL NIGHT WINDOW','23:00–04:00'),('SERVER NIGHT', 'Active' if pub.get('night_mode') else 'Inactive'),
+            rows=[('LOCAL NIGHT POLICY','Legacy · not used by background sync'),
+                  ('SERVER NIGHT WINDOW','23:30–04:00 Stockholm'),('SERVER NIGHT', 'Active' if pub.get('night_mode') else 'Inactive'),
                   ('HEARTBEAT','Enabled' if p['heartbeat'] else 'Disabled'),
                   ('MUSIC','Independent of night and presence')]
             actions=['[n] Toggle night policy  [h] Toggle heartbeat']
@@ -180,8 +180,9 @@ class UI:
         if key in (10,13,curses.KEY_ENTER):self.page=MENU[self.selected][1];self.note='';return True
         if key==27:self.page='overview';self.selected=0;self.note='';return True
         if self.page=='presence':
-            if key==ord('o'):self.action(lambda:legacy.cmd_offline('false'),'Online')
-            elif key==ord('f'):self.action(lambda:legacy.cmd_offline('true'),'Offline')
+            if key==ord('a'):self.action(lambda:legacy.cmd_presence_mode('auto'),'Automatic presence')
+            elif key==ord('o'):self.action(lambda:legacy.cmd_presence_mode('online'),'Manual online')
+            elif key==ord('f'):self.action(lambda:legacy.cmd_presence_mode('offline'),'Manual offline')
             elif key==ord('s'):
                 status=self.choose_status()
                 if status is not None:

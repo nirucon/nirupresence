@@ -2,7 +2,7 @@
 
 A lightweight Linux terminal application for managing presence, status updates, music activity and related features on my personal website.
 
-**Version 0.5.6 · Personal project · Open source · MIT License**  
+**Version 0.5.7 · Personal project · Open source · MIT License**  
 Created by **Ing Leif Nicklas Rudolfsson**.
 
 ## About this project
@@ -48,7 +48,7 @@ nirupresence microlog 'Text to publish'
 
 ## Multi-computer safety
 
-**Heartbeat is OFF by default on new Debian/Void installations.** Music sharing is ON. This avoids an idle secondary computer continuously claiming global presence or triggering night/offline actions. Enable heartbeat on the computer you want to report Daily Driver first signal. The original 0.4.1 night policy uses 23:00–04:00 and is OFF by default on Linux. The server has shared global music state: **this release does not solve cross-device ownership or music arbitration**. Two simultaneously playing computers can still overwrite each other's Now Playing. Do not enable night policy on multiple machines. Historical Daily Driver rows are server-side and are not cleared by this client.
+**Heartbeat is ON by default for new Debian/Void configurations.** Existing `linux.json` preferences are preserved, so upgrade users may need to enable it explicitly. The server determines automatic presence (two-hour contact window and 23:30–04:00 Europe/Stockholm night window). In the Presence view choose **a** for Auto, **o** for manual Online, or **f** for manual Offline. These are global server modes shared across computers. The legacy local night-policy setting is not used by the 0.5.7 background sync. Music sharing remains independent and ON by default. Multiple simultaneously playing computers can still overwrite the shared Now Playing state. Historical Daily Driver rows are server-side and are not cleared by this client.
 
 ## Upgrading and rollback
 

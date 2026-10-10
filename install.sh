@@ -99,7 +99,7 @@ DESKTOP
   info 'For plain dwm/startx without XDG autostart, add this to ~/.xinitrc before exec dwm:'
   info '  ~/.local/bin/nirupresence daemon &'
 fi
-info 'Installed NIRUPRESENCE 0.5.6'
+info 'Installed NIRUPRESENCE 0.5.7'
 info 'Open TUI: nirupresence'
 info 'Configure token in TUI → Settings → t, or import from JSON with Settings → f.'
 info 'Default: music sync enabled, heartbeat OFF for multi-device safety.'
