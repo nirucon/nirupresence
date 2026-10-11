@@ -1,8 +1,8 @@
 # NIRUPRESENCE
 
-Personal Linux companion for n.rudolfsson.net. **0.5.8** · MIT license.
+Personal Linux companion for n.rudolfsson.net. **0.5.9** · MIT license.
 
-Supports Debian/Ubuntu (systemd user service) and Void Linux (XDG autostart). Music sharing and heartbeat run independently of the terminal UI. Presence AUTO, night hours and manual offline are controlled by the server.
+Supports Debian/Ubuntu (systemd user service) and Void Linux (XDG autostart or dwm/xinit session autostart). Music sharing and heartbeat run independently of the terminal UI. Presence AUTO, night hours and manual offline are controlled by the server.
 
 ## Install / update
 
@@ -25,9 +25,13 @@ nirupresence doctor
 nirupresence sync
 ```
 
-On Void, check `~/.config/autostart/nirupresence.desktop`. The desktop session must support XDG autostart. Minimal dwm/startx setups without it need `~/.local/bin/nirupresence daemon &` before `exec dwm` in `~/.xinitrc`. The daemon's file lock prevents duplicates. On Debian use `systemctl --user status nirupresence.service`.
+On Void with an existing `~/.xinitrc` sourcing `~/.config/xinitrc.d/*.sh`, the installer adds `80-nirupresence.sh` to start inside the graphical D-Bus session. Other Void desktops use XDG autostart. Installation does not start a daemon from a potentially incorrect installer environment. The daemon's file lock prevents duplicates. On Debian use `systemctl --user status nirupresence.service`.
 
 The last background result is in `~/.local/state/nirupresence/last-sync.json`; errors in `daemon.log` or `startup.log`. Do not share tokens or private config files.
+
+## 0.5.9
+
+Void dwm/xinit autostart now inherits the graphical D-Bus session. An inaccessible MPRIS bus no longer clears Now Playing. Debian systemd startup remains unchanged. Existing config and state are preserved.
 
 ## 0.5.8
 
