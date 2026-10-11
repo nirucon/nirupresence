@@ -82,24 +82,25 @@ SERVICE
   fi
 else
   mkdir -p "$HOME/.config/autostart"
-  cat > "$HOME/.config/autostart/nirupresence.desktop" <<'DESKTOP'
+  # XDG Desktop Entry Exec is NOT a shell. Single quotes and $HOME are not expanded.
+  # Use the real absolute path; escape characters significant to the Exec grammar.
+  desktop_exec="${BIN//\\/\\\\}"
+  desktop_exec="${desktop_exec// /\\ }"
+  cat > "$HOME/.config/autostart/nirupresence.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=NIRUPRESENCE
-Exec=sh -c 'exec "$HOME/.local/bin/nirupresence" daemon'
+Exec=$desktop_exec daemon
 Terminal=false
 X-GNOME-Autostart-enabled=true
 DESKTOP
-  if command -v setsid >/dev/null; then
-    setsid "$BIN" daemon </dev/null >>"$STATE/startup.log" 2>&1 &
-  else
-    nohup "$BIN" daemon </dev/null >>"$STATE/startup.log" 2>&1 &
-  fi
+  # Detach fully from the installer terminal. flock in daemon prevents duplicates.
+  nohup "$BIN" daemon </dev/null >>"$STATE/startup.log" 2>&1 &
   info 'Void: daemon started now; XDG autostart installed.'
   info 'For plain dwm/startx without XDG autostart, add this to ~/.xinitrc before exec dwm:'
   info '  ~/.local/bin/nirupresence daemon &'
 fi
-info 'Installed NIRUPRESENCE 0.5.7'
+info 'Installed NIRUPRESENCE 0.5.8'
 info 'Open TUI: nirupresence'
 info 'Configure token in TUI → Settings → t, or import from JSON with Settings → f.'
-info 'Default: music sync enabled, heartbeat OFF for multi-device safety.'
+info 'Default: music sync and heartbeat enabled; server controls AUTO/night mode.'
