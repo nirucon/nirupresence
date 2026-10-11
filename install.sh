@@ -81,12 +81,29 @@ SERVICE
     info 'User systemd unavailable: run nirupresence daemon manually or enable it after login.'
   fi
 else
-  mkdir -p "$HOME/.config/autostart"
-  # XDG Desktop Entry Exec is NOT a shell. Single quotes and $HOME are not expanded.
-  # Use the real absolute path; escape characters significant to the Exec grammar.
-  desktop_exec="${BIN//\\/\\\\}"
-  desktop_exec="${desktop_exec// /\\ }"
-  cat > "$HOME/.config/autostart/nirupresence.desktop" <<DESKTOP
+  # Void: start inside the graphical session, never from the installer
+  # (which may not have the session D-Bus address).
+  if [[ "${ID:-}" == void && -f "$HOME/.xinitrc" && -d "$HOME/.config/xinitrc.d" ]] && grep -q 'xinitrc.d/' "$HOME/.xinitrc"; then
+    mkdir -p "$HOME/.config/xinitrc.d"
+    cat > "$HOME/.config/xinitrc.d/80-nirupresence.sh" <<'XINIT'
+#!/usr/bin/env bash
+# Loaded by ~/.xinitrc inside the graphical D-Bus session.
+if [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]] && command -v nirupresence >/dev/null 2>&1; then
+  nirupresence daemon </dev/null >>"$HOME/.local/state/nirupresence/startup.log" 2>&1 &
+fi
+XINIT
+    chmod 755 "$HOME/.config/xinitrc.d/80-nirupresence.sh"
+    # Remove only the XDG entry previously installed by NIRUPRESENCE.
+    desktop="$HOME/.config/autostart/nirupresence.desktop"
+    if [[ -f "$desktop" ]] && grep -qx 'Name=NIRUPRESENCE' "$desktop"; then
+      mv "$desktop" "$desktop.disabled"
+    fi
+    info 'Void dwm/xinit: session-aware autostart installed (next graphical login).'
+  else
+    mkdir -p "$HOME/.config/autostart"
+    desktop_exec="${BIN//\\/\\\\}"
+    desktop_exec="${desktop_exec// /\\ }"
+    cat > "$HOME/.config/autostart/nirupresence.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=NIRUPRESENCE
@@ -94,13 +111,12 @@ Exec=$desktop_exec daemon
 Terminal=false
 X-GNOME-Autostart-enabled=true
 DESKTOP
-  # Detach fully from the installer terminal. flock in daemon prevents duplicates.
-  nohup "$BIN" daemon </dev/null >>"$STATE/startup.log" 2>&1 &
-  info 'Void: daemon started now; XDG autostart installed.'
-  info 'For plain dwm/startx without XDG autostart, add this to ~/.xinitrc before exec dwm:'
-  info '  ~/.local/bin/nirupresence daemon &'
+    # Do not launch a daemon from the installer's potentially incomplete
+    # graphical environment. XDG autostart starts it at the next login.
+    info 'XDG autostart installed (next graphical login).'
+  fi
 fi
-info 'Installed NIRUPRESENCE 0.5.8'
+info 'Installed NIRUPRESENCE 0.5.9'
 info 'Open TUI: nirupresence'
 info 'Configure token in TUI → Settings → t, or import from JSON with Settings → f.'
 info 'Default: music sync and heartbeat enabled; server controls AUTO/night mode.'
