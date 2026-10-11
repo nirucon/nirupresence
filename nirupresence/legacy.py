@@ -157,8 +157,12 @@ def playerctl_metadata():
     exe=shutil.which("playerctl")
     if not exe: return {"available":False,"playing":False,"reason":"playerctl saknas"}
     try:
-        players=subprocess.run([exe,"-l"],capture_output=True,text=True,timeout=3).stdout.splitlines()
-    except Exception: players=[]
+        discovery=subprocess.run([exe,"-l"],capture_output=True,text=True,timeout=3)
+        if discovery.returncode != 0:
+            return {"available":False,"playing":False,"reason":"MPRIS/D-Bus unavailable"}
+        players=discovery.stdout.splitlines()
+    except (OSError, subprocess.TimeoutExpired):
+        return {"available":False,"playing":False,"reason":"MPRIS/D-Bus unavailable"}
     playing=[]
     for order, player in enumerate(players):
         player=player.strip()
