@@ -1,8 +1,8 @@
 # NIRUPRESENCE
 
-Personal Linux companion for n.rudolfsson.net. **0.5.9** · MIT license.
+Personal Linux companion for n.rudolfsson.net. **0.5.10** · MIT license.
 
-Supports Debian/Ubuntu (systemd user service) and Void Linux (XDG autostart or dwm/xinit session autostart). Music sharing and heartbeat run independently of the terminal UI. Presence AUTO, night hours and manual offline are controlled by the server.
+Supports Debian/Ubuntu and Arch (systemd user service) plus Void Linux (nirupi, dwm/xinit or XDG session autostart). Music sharing and heartbeat run independently of the terminal UI. Presence AUTO, night hours and manual offline are controlled by the server.
 
 ## Install / update
 
@@ -25,9 +25,13 @@ nirupresence doctor
 nirupresence sync
 ```
 
-On Void with an existing `~/.xinitrc` sourcing `~/.config/xinitrc.d/*.sh`, the installer adds `80-nirupresence.sh` to start inside the graphical D-Bus session. Other Void desktops use XDG autostart. Installation does not start a daemon from a potentially incorrect installer environment. The daemon's file lock prevents duplicates. On Debian use `systemctl --user status nirupresence.service`.
+On Debian and Arch the installer uses the systemd user service. On Void it installs every applicable graphical-session hook: nirupi autostart when present, `~/.config/xinitrc.d/80-nirupresence.sh` when `~/.xinitrc` sources that directory, and the XDG autostart entry. The daemon's file lock prevents duplicates, and Void hooks start at the next graphical login rather than from the installer environment.
 
-The last background result is in `~/.local/state/nirupresence/last-sync.json`; errors in `daemon.log` or `startup.log`. Do not share tokens or private config files.
+The last background result is in `~/.local/state/nirupresence/last-sync.json`; errors in `daemon.log` or `startup.log`. Do not share tokens or private config files. Use `systemctl --user status nirupresence.service` on Debian and Arch.
+
+## 0.5.10
+
+Void autostart now covers SDDM/nirupi sessions as well as dwm/xinit and XDG desktops; applicable hooks are installed together and the existing daemon lock prevents duplicates. Adds Arch and Arch derivatives to the installer with pacman package handling. Debian/Ubuntu and systemd startup are unchanged. Existing config and state are preserved.
 
 ## 0.5.9
 
